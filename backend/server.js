@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 
-const PORT = 3000
+const PORT = 4000
 
 // Middleware
 const authRequired = require('./middleware/auth')
