@@ -12,4 +12,44 @@ const LoginUser = async (user) => {
     return res.data
 }
 
-export default LoginUser
+const RegisterUser = async (user) => {
+    const res = await axios.post("/auth/register", user)
+
+    if (res.data.status === 1) {
+        console.log(res.data.error)
+    }
+
+    return res.data
+}
+
+const setToken = () => {
+  let auth = "";
+  try {
+    auth = window.localStorage.getItem('Authorization');
+  } catch {
+    auth = "";
+  }
+
+  axios.defaults.headers.common['Authorization'] = auth;
+}
+
+const removeToken = () => {
+  try {
+    window.localStorage.removeItem('Authorization')
+  } catch {
+    
+  }
+}
+
+const getUser = async () => {
+    setToken()
+    const res = await axios.post("/user/token")
+    if (res.data.status === 1)
+    {
+        removeToken()
+        return null
+    }
+    return res.data
+}
+
+export { LoginUser, RegisterUser, getUser, setToken, removeToken }

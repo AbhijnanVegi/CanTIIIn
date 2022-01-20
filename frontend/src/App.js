@@ -5,12 +5,14 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+import 'antd/dist/antd.dark.css';
 import './App.css';
 
 import Navbar from "./components/templates/navbar"
-import Title from "./components/common/title"
+import Title from "./components/pages/title"
 import LoginForm from "./components/pages/login"
 import RegisterForm from "./components/pages/register"
+import Profile from "./components/pages/profile"
 
 const Layout = () => {
   return (
@@ -31,7 +33,7 @@ function App() {
           <Route path="/" element={<Title />} />
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
-          {/* <Route path="profile" element={<Profile />} /> */}
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

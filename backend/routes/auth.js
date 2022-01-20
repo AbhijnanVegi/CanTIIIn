@@ -2,6 +2,7 @@ var express = require("express")
 var router = express.Router()
 var jwt = require("jsonwebtoken") 
 var bcrypt = require("bcrypt")
+const { DateTime } = require("luxon")
 
 const User = require("../models/users")
 const { Buyer, Vendor} = require("../models/types")
@@ -40,6 +41,7 @@ router.post("/login", async(req, res) => {
 
 router.post("/register", async (req, res) => {
     const body = req.body
+    console.log(body)
 
     const saltRounds = 10
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -123,6 +125,8 @@ router.post("/register", async (req, res) => {
             })
         }
 
+        var opening = DateTime.fromISO(body.opening).toLocaleString(DateTime.TIME_24_SIMPLE)
+        var closing = DateTime.fromISO(body.closing).toLocaleString(DateTime.TIME_24_SIMPLE)
 
         if (body.shopname == null)
             return res.status(200).json({
@@ -139,8 +143,8 @@ router.post("/register", async (req, res) => {
 
         profile = new Vendor({
             name: body.shopname,
-            opening: body.opening,
-            closing: body.closing
+            opening: opening,
+            closing: closing
         })
     }
 

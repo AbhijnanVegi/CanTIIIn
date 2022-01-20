@@ -11,6 +11,7 @@ const authRequired = require('./middleware/auth')
 
 // Routers
 var AuthRouter = require("./routes/auth")
+var UserRouter = require("./routes/user")
 var ProductsRouter = require("./routes/products")
 var OrderRouter = require("./routes/orders")
 
@@ -27,6 +28,7 @@ connection.once('open', function () {
 app.use("/api/auth", AuthRouter)
 
 app.use(authRequired)
+app.use('/api/user', UserRouter)
 
 app.use("/api/products", ProductsRouter)
 app.use("/api/orders", OrderRouter)

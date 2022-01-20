@@ -36,16 +36,12 @@ const VendorSchema = new Schema({
         unique: true
     },
     opening: {
-        type: Number,
+        type: String,
         required: true,
-        min: 0,
-        max : 1440
     },
     closing: {
-        type: Number,
+        type: String,
         required: true,
-        min: 0,
-        max: 1440
     }
 })
 
