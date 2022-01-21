@@ -1,7 +1,7 @@
 import { Container, Paper, Typography } from "@mui/material";
 import { Form, Input, Button, message, Select, TimePicker } from "antd";
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, SmileOutlined, ShopOutlined } from '@ant-design/icons';
 
@@ -14,10 +14,11 @@ const Profile = () => {
     const [IsBuyer, setIsBuyer] = useState(true);
     const [Edit, setEdit] = useState(false);
     const [form] = Form.useForm()
+    const navigate = useNavigate()
 
     useEffect(async () => {
         const u = await getUser()
-        if (!u) Navigate("/login")
+        if (!u) navigate("/login")
         if (u.type === 'buyer') {
             setIsBuyer(true)
         }
@@ -95,7 +96,7 @@ const Profile = () => {
                         <>
                             <Form.Item
                                 name="age"
-                            rules={[{ required: true, message: 'Please input your age!' }, { len: 2, pattern: "^[0-9]*$", message: "Enter a valid phone number" }]}
+                            rules={[{ required: true, message: 'Please input your age!' }, { len: 2, pattern: "^[0-9]*$", message: "Enter a valid age" }]}
                             >
                                 <Input
                                     prefix={<SmileOutlined className="site-form-item-icon" />}

@@ -13,14 +13,14 @@ router.post("/login", async(req, res) => {
 
     const user = await User.findOne({ email: body.email })
     if (!user) {
-        return res.status(400).json({
+        return res.status(200).json({
             status: 1,
             error : "Email not registered"
         })
     }
 
     if (!(await bcrypt.compare(body.password, user.password))) {
-        return res.status(400).json({
+        return res.status(200).json({
             status: 1,
             error : "Incorrect login credentials"
         })

@@ -13,6 +13,7 @@ import Title from "./components/pages/title"
 import LoginForm from "./components/pages/login"
 import RegisterForm from "./components/pages/register"
 import Profile from "./components/pages/profile"
+import Dashboard from "./components/pages/dashboard"
 
 const Layout = () => {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,9 +1,9 @@
 import { Grid, Container, Paper, Typography } from '@mui/material'
 import { Form, Input, Button, message, Radio, Select, TimePicker } from "antd"
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, SmileOutlined, ShopOutlined } from '@ant-design/icons';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { RegisterUser } from "../../services/auth"
+import { RegisterUser, getUser } from "../../services/auth"
 
 const RegisterForm = () => {
 
@@ -14,8 +14,6 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e) => {
         const res = await RegisterUser(e)
-        console.log(e)
-        // const res = null
         if (res.status === 1) {
             message.error(res.error)
         }
@@ -27,6 +25,16 @@ const RegisterForm = () => {
     const onChange = (e) => {
         setType(e.target.value)
     }
+
+    useEffect(() => {
+        async function checkUser() {
+            var u = await getUser()
+            if (u) {
+                navigate("/")
+            }
+        }
+        checkUser()
+    })
 
     return (
         <Container maxWidth="sm">

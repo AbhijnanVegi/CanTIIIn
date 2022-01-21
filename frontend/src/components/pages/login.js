@@ -1,9 +1,9 @@
 import { Grid, Container, Paper, Typography, TextField, Alert } from "@mui/material"
 import { Form, Input, Button, message } from "antd"
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { LoginUser } from "../../services/auth"
+import { LoginUser, getUser } from "../../services/auth"
 
 const LoginForm = () => {
 
@@ -21,9 +21,19 @@ const LoginForm = () => {
         }
         else {
             window.localStorage.setItem('Authorization', 'Bearer ' + res.token);
-            navigate("/")
+            navigate("/dashboard")
         }
     }
+
+    useEffect(() => {
+        async function checkUser() {
+            var u = await getUser()
+            if (u) {
+                navigate("/")
+            }
+        }
+        checkUser()
+    })
 
     return (
         <Container maxWidth="xs">
@@ -38,7 +48,7 @@ const LoginForm = () => {
                     name="basic"
                     form={form}
                     labelCol={{ span: 6 }}
-                    wrapperCol={{ offset:5, span: 14 }}
+                    wrapperCol={{ offset: 5, span: 14 }}
                     initialValues={{ remember: true }}
                     onFinish={handleSubmit}
                     size="large"
