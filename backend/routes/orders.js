@@ -7,25 +7,23 @@ const {Buyer, Vendor} = require("../models/types")
 
 router.post('/new', async (req, res) => {
     if (req.user.type !== "buyer") {
-        return res.status(401).json({message: "Unauthorised"})
+        return res.status(201).json({status:1, error:"Unauthorised"})
     }
-
-    const product = await Product.findById(req.body.productId)
-    const addonsreq = JSON.parse(req.body.addons)
-
     console.log(req.body)
 
+    const product = await Product.findById(req.body.productId)
+
     if (!product) {
-        return res.status(404).json({message: "Product not found"})
+        return res.status(200).json({status:1,error: "Product not found"})
     }
     if (req.body.quantity <= 0)
-        return res.status(400).json({message: "Quantity must be positive"})
+        return res.status(400).json({status:1,error: "Quantity must be positive"})
 
     var total = product.price
     var addons = []
-    if (addonsreq) {
+    if (req.body.addons) {
         product.addons.forEach(addon => {
-            if (addonsreq.includes(addon._id.toString())) {
+            if (req.body.addons.includes(addon._id.toString())) {
                 addons.push(addon)
                 total += addon.price
             }
@@ -37,7 +35,7 @@ router.post('/new', async (req, res) => {
     
     var buyer = await Buyer.findOne({ email: req.user.email })
     if (buyer.wallet < total) {
-        return res.status(400).json({ message: "Insufficient balance" })
+        return res.status(200).json({ status:1, error: "Insufficient balance" })
     }
     else {
         buyer.wallet -= total
@@ -53,7 +51,7 @@ router.post('/new', async (req, res) => {
         (vendor.opening > vendor.closing && (now < vendor.opening && now > vendor.closing))
     ) 
     {
-        return res.status(400).json({message: "Vendor is closed"})
+        return res.status(200).json({status:1,error: "Vendor is closed"})
     }
 
     var order = new Order({
@@ -70,10 +68,10 @@ router.post('/new', async (req, res) => {
 
     order.save((err) => {
         if (err) {
-            return res.status(500).json(err)
+            return res.status(200).json({status : 1, error: err})
         }
         buyer.save()
-        return res.status(201).json({message: "Order placed successfully"})
+        return res.status(201).json({status:0,message: "Order placed successfully"})
     })
 
 })
