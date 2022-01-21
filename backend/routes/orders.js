@@ -1,6 +1,8 @@
 var express =  require("express")
 var router = express.Router()
 
+const { DateTime } = require("luxon")
+
 const Order = require("../models/orders")
 const Product =  require("../models/products")
 const {Buyer, Vendor} = require("../models/types")
@@ -42,13 +44,15 @@ router.post('/new', async (req, res) => {
     }
 
     var now = new Date()
-    now = now.getHours() * 60 + now.getMinutes()
+    // now = now.getHours() * 60 + now.getMinutes()
 
     const vendor = await Vendor.find({name : product.vendor})
+    const opening = DateTime.fromISO(vendor.opening)
+    const closing = DateTime.fromISO(vendor.closing)
     console.log(vendor)
     if (
-        (vendor.opening < vendor.closing && (now < vendor.opening || now > vendor.closing)) ||
-        (vendor.opening > vendor.closing && (now < vendor.opening && now > vendor.closing))
+        (opening < closing && (now < opening || now > closing)) ||
+        (opening > closing && (now < opening && now > closing))
     ) 
     {
         return res.status(200).json({status:1,error: "Vendor is closed"})

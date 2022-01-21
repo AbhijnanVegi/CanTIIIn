@@ -11,7 +11,6 @@ const BuyerSchema = new Schema({
     age: {
         type: Number,
         required: true,
-        min: 18,
         max: 100
     },
     batch: {

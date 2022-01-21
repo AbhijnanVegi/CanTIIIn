@@ -19,16 +19,7 @@ const BuyerDashboard = () => {
     const [Visible, SetVisible] = useState(false)
     const [BuyProduct, SetBuyProduct] = useState({})
 
-    const [CanFilter, setCanFilter] = useState([
-        {
-            text: 'JC',
-            value: 'JC',
-        },
-        {
-            text: 'BBC',
-            value: 'BBC'
-        }
-    ])
+    const [CanFilter, setCanFilter] = useState([])
 
 
     const onVegFilterChange = (checked) => {
@@ -59,7 +50,6 @@ const BuyerDashboard = () => {
     }
 
     const handleChange = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
         setTagFilter(filters.tags)
         setVendorFilter(filters.vendor)
     };
@@ -169,12 +159,20 @@ const BuyerDashboard = () => {
         }
     ]
 
-    useEffect(() => {
+    useEffect(async () => {
         async function getProducts() {
             const data = await getProductList()
             setProducts(data)
+            var vendors = []
+            data.forEach((p) => vendors.push(p.vendor))
+            vendors = [...new Set(vendors)]
+            var vf = []
+            vendors.forEach((v) => vf.push({text: v, value: v}))
+            console.log(vf)
+            setCanFilter(vf)
         }
         getProducts()
+
     }, [])
 
     return (
