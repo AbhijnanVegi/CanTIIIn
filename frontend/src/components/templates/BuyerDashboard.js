@@ -1,9 +1,9 @@
-import { Button, Table, Tag, Input, Switch, Row, Col, message, Modal, Form, Select } from 'antd'
+import { Button, Table, Tag, Input, Switch, Row, Col, message, Modal, Form, Select, Space } from 'antd'
 import { Typography } from "@mui/material"
 import { useState, useEffect } from "react"
 import { HeartOutlined, HeartFilled } from '@ant-design/icons'
 
-import { getProductList, placeOrder } from '../../services/product'
+import { getProductList, placeOrder, toggleFav } from '../../services/product'
 
 const BuyerDashboard = () => {
 
@@ -53,6 +53,46 @@ const BuyerDashboard = () => {
         SetVisible(true)
     }
 
+    const findProduct = (id) => {
+        const a = Allproducts.available.findIndex((p) => (p._id === id))
+        const c = Allproducts.unavailable.findIndex((p) => (p._id === id))
+        if (a !== -1) {
+            const b = Allproducts.afavourites.findIndex((p) => (p._id === id))
+            if (b !== -1) return { fav: true, available: true, index: a , findex:b}
+            else return { fav: false, available: true, index: a, findex: b }
+        }
+        else if (c !== -1) {
+            const b = Allproducts.ufavourites.findIndex((p) => (p._id === id))
+            if (b!== -1) return { fav: true, available: false, index: c, findex:b }
+            else return { fav: false, available: false, index: c, findex:b }
+        }
+    }
+
+    const handleFav = async (id) => {
+        const data = { productId: id }
+        const res = await toggleFav(data)
+        const det = findProduct(id)
+        console.log(det)
+        if (res.status === 1)
+            message.error(res.error)
+        else {
+            message.success(res.message)
+            if (det.available) {
+                if (det.fav)
+                    Allproducts.afavourites.splice(det.findex, 1)
+                else
+                    Allproducts.afavourites.push(Allproducts.available[det.index])
+            }
+            else {
+                if (det.fav)
+                    Allproducts.ufavourites.splice(det.findex, 1)
+                else
+                    Allproducts.ufavourites.push(Allproducts.unavailable[det.index])
+            }
+        }
+        console.log(Allproducts.afavourites)
+    }
+
     const handleChange = (pagination, filters, sorter) => {
         setTagFilter(filters.tags)
         setVendorFilter(filters.vendor)
@@ -73,7 +113,7 @@ const BuyerDashboard = () => {
         const data = await getProductList()
         setAllProducts(data.message)
         setProducts(data.message.available)
-        
+
         var vendors = []
         data.message.available.forEach((p) => vendors.push(p.vendor))
         data.message.unavailable.forEach((p) => vendors.push(p.vendor))
@@ -83,8 +123,8 @@ const BuyerDashboard = () => {
         setCanFilter(vf)
 
         var tags = []
-        data.message.available.forEach((p) => p.tags.forEach((tag)=> tags.push(tag)))
-        data.message.unavailable.forEach((p) => p.tags.forEach((tag)=> tags.push(tag)))
+        data.message.available.forEach((p) => p.tags.forEach((tag) => tags.push(tag)))
+        data.message.unavailable.forEach((p) => p.tags.forEach((tag) => tags.push(tag)))
         tags = [...new Set(tags)]
         var tf = []
         tags.forEach((t) => tf.push({ text: t, value: t }))
@@ -163,11 +203,12 @@ const BuyerDashboard = () => {
             filteredValue: [PriceFilter]
         },
         {
-            title: 'Buy',
+            title: 'Actions',
             key: 'buy',
             render: (text, record) => (
                 <>
                     <Button type="primary" onClick={() => { handleBuy(record._id) }}>Buy</Button>
+                    <Button style={{marginLeft : "1rem"}} type="primary" onClick={() => handleFav(record._id)}>{findProduct(record._id).fav ? <HeartFilled /> : <HeartOutlined />}</Button>
                 </>
             )
         }
@@ -244,11 +285,12 @@ const BuyerDashboard = () => {
             filteredValue: [PriceFilter]
         },
         {
-            title: 'Buy',
+            title: 'Actions',
             key: 'buy',
             render: (text, record) => (
                 <>
                     <Button type="primary" disabled>Buy</Button>
+                    <Button style={{marginLeft : "1rem"}} type="primary" onClick={() => handleFav(record._id)}>{findProduct(record._id).fav ? <HeartFilled /> : <HeartOutlined />}</Button>
                 </>
             )
         }
@@ -257,16 +299,16 @@ const BuyerDashboard = () => {
     return (
         <>
             <Row><Col span={1} offset={0}>
-                    <Button type="primary" onClick={()=> setFavourite(!Favourite)}>{ Favourite?<HeartFilled />:<HeartOutlined/> }</Button>
-                </Col>
+                <Button type="primary" onClick={() => setFavourite(!Favourite)}>{Favourite ? <HeartFilled /> : <HeartOutlined />}</Button>
+            </Col>
                 <Col style={{ paddingBottom: "5px" }} span={8}>
-                    <Input.Search onChange={handleSearch} placeholder='Search'/>
+                    <Input.Search onChange={handleSearch} placeholder='Search' />
                 </Col>
                 <Col span={5} offset={8}>
                     <Input.Group compact><Input placeholder='Min' style={{ width: "20%" }} onChange={handleMin} /><Input placeholder='Max' style={{ width: "20%" }} onChange={handleMax} /></Input.Group>
                 </Col>
                 <Col span={1} offset={0}>
-                    <Switch onChange={onVegFilterChange} checkedChildren="Veg" unCheckedChildren="Any"/>
+                    <Switch onChange={onVegFilterChange} checkedChildren="Veg" unCheckedChildren="Any" />
                 </Col>
             </Row>
             <Table

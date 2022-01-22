@@ -13,4 +13,10 @@ const placeOrder = async (e) => {
     return res.data
 }
 
-export { getProductList, placeOrder }
+const toggleFav = async (e) => {
+    setToken()
+    const res = await axios.post("/products/favourite", e)
+    return res.data
+}
+
+export { getProductList, placeOrder, toggleFav }

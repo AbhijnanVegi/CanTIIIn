@@ -34,7 +34,7 @@ const Navbar = () => {
       var wallet = await GetWallet()
       setWallet(wallet.message)
     }
-  })
+  }, [user, navigate])
 
   const Logout = () => {
     removeToken()

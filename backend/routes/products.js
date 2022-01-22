@@ -45,8 +45,6 @@ router.get('/', async (req, res) => {
         }
     })
     
-    console.log(resJson)
-
     return res.json({status:0, message: resJson})
 })
 
@@ -76,13 +74,13 @@ router.post('/new', async (req, res) => {
 
 router.post('/favourite', async (req, res) => {
     if (req.user.type !== "buyer") {
-        return res.status(401).json({ message: "Unauthorized" })
+        return res.status(401).json({status:0, message: "Unauthorized" })
     }
 
     const product = await Product.findById(req.body.productId)
 
     if (!product) {
-        return res.status(404).json({ message: "Product not found" })
+        return res.status(404).json({status:0, message: "Product not found" })
     }
 
     var buyer = await Buyer.findOne({ email: req.user.email })
@@ -97,7 +95,7 @@ router.post('/favourite', async (req, res) => {
         if (err) {
             return res.status(500).json(err)
         }
-        return res.status(201).json({ message: "Favourite updated" })
+        return res.status(201).json({status:0, message: "Favourite updated" })
     })
 
 })
