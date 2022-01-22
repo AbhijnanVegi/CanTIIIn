@@ -26,6 +26,31 @@ router.post('/profile', async (req, res) => {
     res.send(rest)
 })
 
+router.get('/wallet', async (req, res) => {
+    if (req.user.type !== 'buyer') return res.json({status:1, error:"Not applicable"})
+
+    var user = await Buyer.findOne({ email: req.user.email })
+    return res.json({status: 0, message: user.wallet})
+})
+
+router.post('/wallet', async (req, res) => {
+    if (req.user.type !== 'buyer') return res.json({status:1, error:"Not applicable"})
+
+    var user = await Buyer.findOne({ email: req.user.email })
+    var wallet
+    try {
+        wallet = { wallet: user.wallet + parseInt(req.body.amount) }
+    }
+    catch {
+        return res.json({status: 0, error: "Invalid amount"})
+    }
+    Buyer.updateOne({ email: req.user.email }, wallet, (err, doc) => {
+        if (err)
+            return res.json({ status: 1, error: err })
+        res.json({status:0, message:"Wallet updated successfully"})
+    })
+})
+
 router.post('/profile/update', async (req, res) => {
     const userUp = {
         name: req.body.name,

@@ -18,4 +18,16 @@ const UpdateUserProfile = async (user) => {
     return res.data
 }
 
-export { GetUserProfile, UpdateUserProfile }
+const GetWallet = async () => {
+    const res = await axios.get("/user/wallet")
+
+    return res.data
+}
+
+const UpdateWallet = async (v) => {
+    const res = await axios.post("/user/wallet", v)
+
+    return res.data
+}
+
+export { GetUserProfile, UpdateUserProfile, GetWallet, UpdateWallet }

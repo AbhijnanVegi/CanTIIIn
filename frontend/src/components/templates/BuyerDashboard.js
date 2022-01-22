@@ -58,7 +58,6 @@ const BuyerDashboard = () => {
         var data = d
         data.productId = BuyProduct._id
         const res = await placeOrder(data)
-        console.log(res)
         if (res.status === 1)
             message.error(res.error)
         else
@@ -168,7 +167,6 @@ const BuyerDashboard = () => {
             vendors = [...new Set(vendors)]
             var vf = []
             vendors.forEach((v) => vf.push({text: v, value: v}))
-            console.log(vf)
             setCanFilter(vf)
         }
         getProducts()
@@ -178,13 +176,13 @@ const BuyerDashboard = () => {
     return (
         <>
             <Row>
-                <Col style={{ paddingBottom: "5px" }} span={6}>
+                <Col style={{ paddingBottom: "5px" }} span={8}>
                     <Input.Search onChange={handleSearch} />
                 </Col>
-                <Col span={8} offset={2}>
+                <Col span={5} offset={9}>
                     <Input.Group compact>Price : <Input placeholder='Min' style={{ width: "20%" }} onChange={handleMin} /><Input placeholder='Max' style={{ width: "20%" }} onChange={handleMax} /></Input.Group>
                 </Col>
-                <Col span={2} offset={6}>
+                <Col span={2} offset={0}>
                     <p style={{ color: "white" }}>Veg : <Switch onChange={onVegFilterChange} /></p>
                 </Col>
             </Row>
@@ -229,7 +227,7 @@ const BuyerDashboard = () => {
                             placeholder="Addons"
                         >
                             {BuyProduct.name &&
-                                BuyProduct.addons.map((a, i) => { console.log(a, i); return <Select.Option value={a._id} label={a.name}>{a.name} {a.price}rs</Select.Option> })
+                                BuyProduct.addons.map((a, i) =>  <Select.Option value={a._id} label={a.name}>{a.name} {a.price}rs</Select.Option> )
                             }
 
                         </Select>

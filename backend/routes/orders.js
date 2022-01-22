@@ -11,7 +11,7 @@ router.post('/new', async (req, res) => {
     if (req.user.type !== "buyer") {
         return res.status(201).json({status:1, error:"Unauthorised"})
     }
-    console.log(req.body)
+    // console.log(req.body)
 
     const product = await Product.findById(req.body.productId)
 
@@ -46,10 +46,12 @@ router.post('/new', async (req, res) => {
     var now = new Date()
     // now = now.getHours() * 60 + now.getMinutes()
 
-    const vendor = await Vendor.find({name : product.vendor})
+    const vendor = await Vendor.findOne({name : product.vendor})
     const opening = DateTime.fromISO(vendor.opening)
     const closing = DateTime.fromISO(vendor.closing)
-    console.log(vendor)
+    console.log("now", now)
+    console.log("opening", opening)
+    console.log("closing",closing)
     if (
         (opening < closing && (now < opening || now > closing)) ||
         (opening > closing && (now < opening && now > closing))
