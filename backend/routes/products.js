@@ -3,14 +3,51 @@ var router = express.Router()
 
 const Product = require("../models/products")
 const { Buyer, Vendor } = require("../models/types")
+const { DateTime } = require('luxon')
 
 router.get('/', async (req, res) => {
-    try {
-        const products = await Product.find({})
-        res.json(products)
-    } catch (err) {
-        res.status(500).json({ message: err.message })
+    const vendors = await Vendor.find({})
+
+    const buyer = await Buyer.findOne({email : req.user.email})
+
+    const isOpen = (vendor) => {
+        var now = new Date()
+        const opening = DateTime.fromISO(vendor.opening)
+        const closing = DateTime.fromISO(vendor.closing)
+
+        return (!(
+            (opening < closing && (now < opening || now > closing)) ||
+            (opening > closing && (now < opening && now > closing))
+        ))
+
     }
+
+    var open = {}
+    vendors.forEach((v) => open[v.name] = isOpen(v))
+
+    const products = await Product.find({})
+
+    var resJson = {
+        afavourites: [],
+        ufavourites: [],
+        available: [],
+        unavailable: [],
+    }
+    console.log(buyer)
+    products.forEach((p) => {
+        if (open[p.vendor]) {
+            resJson.available.push(p)
+            if (buyer.favourites.includes(p._id)) resJson.afavourites.push(p)
+        }
+        else {
+            resJson.unavailable.push(p)
+            if (buyer.favourites.includes(p._id)) resJson.ufavourites.push(p)
+        }
+    })
+    
+    console.log(resJson)
+
+    return res.json({status:0, message: resJson})
 })
 
 router.post('/new', async (req, res) => {
@@ -65,7 +102,7 @@ router.post('/favourite', async (req, res) => {
 
 })
 
-router.post('/rate',async (req, res) => {
+router.post('/rate', async (req, res) => {
     if (req.user.type !== "buyer") {
         return res.status(400).json({
             message: "Unauthorised"
@@ -89,7 +126,7 @@ router.post('/rate',async (req, res) => {
     product.rating.total += parseInt(req.body.rating)
 
     product.save((err) => {
-        if(err) {
+        if (err) {
             return res.status(500).json(err)
         }
         return res.status(201).json({ message: "Review added successfully" })

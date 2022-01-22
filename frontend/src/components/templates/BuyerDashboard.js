@@ -1,12 +1,15 @@
 import { Button, Table, Tag, Input, Switch, Row, Col, message, Modal, Form, Select } from 'antd'
 import { Typography } from "@mui/material"
 import { useState, useEffect } from "react"
+import { HeartOutlined, HeartFilled } from '@ant-design/icons'
 
 import { getProductList, placeOrder } from '../../services/product'
 
 const BuyerDashboard = () => {
 
     const [Products, setProducts] = useState([])
+    const [Allproducts, setAllProducts] = useState({})
+    const [Favourite, setFavourite] = useState(false)
 
     const [form] = Form.useForm()
 
@@ -20,6 +23,7 @@ const BuyerDashboard = () => {
     const [BuyProduct, SetBuyProduct] = useState({})
 
     const [CanFilter, setCanFilter] = useState([])
+    const [Tags, setTags] = useState([])
 
 
     const onVegFilterChange = (checked) => {
@@ -64,6 +68,30 @@ const BuyerDashboard = () => {
             message.success('Order placed successfully')
     }
 
+    useEffect(async () => {
+
+        const data = await getProductList()
+        setAllProducts(data.message)
+        setProducts(data.message.available)
+        
+        var vendors = []
+        data.message.available.forEach((p) => vendors.push(p.vendor))
+        data.message.unavailable.forEach((p) => vendors.push(p.vendor))
+        vendors = [...new Set(vendors)]
+        var vf = []
+        vendors.forEach((v) => vf.push({ text: v, value: v }))
+        setCanFilter(vf)
+
+        var tags = []
+        data.message.available.forEach((p) => p.tags.forEach((tag)=> tags.push(tag)))
+        data.message.unavailable.forEach((p) => p.tags.forEach((tag)=> tags.push(tag)))
+        tags = [...new Set(tags)]
+        var tf = []
+        tags.forEach((t) => tf.push({ text: t, value: t }))
+        setTags(tf)
+
+    }, [])
+
     const columns = [
         {
             title: 'Name',
@@ -107,20 +135,7 @@ const BuyerDashboard = () => {
                     })}
                 </>
             ),
-            filters: [
-                {
-                    text: "Cold",
-                    value: "cold"
-                },
-                {
-                    text: "Hot",
-                    value: "hot"
-                },
-                {
-                    text: "Drink",
-                    value: "drink"
-                }
-            ],
+            filters: Tags,
             onFilter: (value, record) => record.tags.includes(value),
             filteredValue: TagFilter
         },
@@ -158,37 +173,113 @@ const BuyerDashboard = () => {
         }
     ]
 
-    useEffect(async () => {
-        async function getProducts() {
-            const data = await getProductList()
-            setProducts(data)
-            var vendors = []
-            data.forEach((p) => vendors.push(p.vendor))
-            vendors = [...new Set(vendors)]
-            var vf = []
-            vendors.forEach((v) => vf.push({text: v, value: v}))
-            setCanFilter(vf)
-        }
-        getProducts()
+    const ucolumns = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            onFilter: (value, record) => value ? record.name.toLowerCase().includes(value.toLowerCase()) : true,
+            filteredValue: [Search]
+        },
+        {
+            title: 'Vendor',
+            dataIndex: 'vendor',
+            key: 'vendor',
+            filters: CanFilter,
+            onFilter: (value, record) => record.vendor.includes(value),
+            filteredValue: VendorFilter
+        },
+        {
+            title: 'Type',
+            dataIndex: 'isnv',
+            key: 'isnv',
+            render: isnv => isnv ? 'Non-Veg' : 'Veg',
+            onFilter: (value, record) => !(record.isnv && (value === 'true')),
+            filteredValue: [VegFilter]
+        },
+        {
+            title: 'Tags',
+            dataIndex: 'tags',
+            key: 'tags',
+            render: tags => (
+                <>
+                    {tags.map(tag => {
+                        let color = 'geekblue';
+                        if (tag === 'loser') {
+                            color = 'volcano';
+                        }
+                        return (
+                            <Tag color={color} key={tag}>
+                                {tag.toUpperCase()}
+                            </Tag>
+                        );
+                    })}
+                </>
+            ),
+            filters: Tags,
+            onFilter: (value, record) => record.tags.includes(value),
+            filteredValue: TagFilter
+        },
+        {
+            title: 'Rating',
+            dataIndex: 'rating',
+            key: 'rating',
+            render: (rating) => {
+                return <>{rating.count ? rating.total / rating.count : 0}</>
+            },
+            sorter: (a, b) => a.rating.count ? a.rating.total / a.rating.count : 0 - b.rating.count ? b.rating.total / b.rating.count : 0,
+        },
+        {
+            title: 'Price',
+            dataIndex: 'price',
+            key: 'price',
+            sorter: (a, b) => a.price - b.price,
+            onFilter: (value, record) => {
+                const f = value.split(';')
+                const min = f[0]
+                const max = f[1]
 
-    }, [])
+                return (record.price >= min && record.price <= max)
+            },
+            filteredValue: [PriceFilter]
+        },
+        {
+            title: 'Buy',
+            key: 'buy',
+            render: (text, record) => (
+                <>
+                    <Button type="primary" disabled>Buy</Button>
+                </>
+            )
+        }
+    ]
 
     return (
         <>
-            <Row>
+            <Row><Col span={1} offset={0}>
+                    <Button type="primary" onClick={()=> setFavourite(!Favourite)}>{ Favourite?<HeartFilled />:<HeartOutlined/> }</Button>
+                </Col>
                 <Col style={{ paddingBottom: "5px" }} span={8}>
-                    <Input.Search onChange={handleSearch} />
+                    <Input.Search onChange={handleSearch} placeholder='Search'/>
                 </Col>
-                <Col span={5} offset={9}>
-                    <Input.Group compact>Price : <Input placeholder='Min' style={{ width: "20%" }} onChange={handleMin} /><Input placeholder='Max' style={{ width: "20%" }} onChange={handleMax} /></Input.Group>
+                <Col span={5} offset={8}>
+                    <Input.Group compact><Input placeholder='Min' style={{ width: "20%" }} onChange={handleMin} /><Input placeholder='Max' style={{ width: "20%" }} onChange={handleMax} /></Input.Group>
                 </Col>
-                <Col span={2} offset={0}>
-                    <p style={{ color: "white" }}>Veg : <Switch onChange={onVegFilterChange} /></p>
+                <Col span={1} offset={0}>
+                    <Switch onChange={onVegFilterChange} checkedChildren="Veg" unCheckedChildren="Any"/>
                 </Col>
             </Row>
             <Table
                 columns={columns}
-                dataSource={Products}
+                dataSource={Favourite ? Allproducts.afavourites : Allproducts.available}
+                pagination={{ position: ["none", "none"] }}
+                onChange={handleChange}>
+
+            </Table>
+            <Typography align="center" color={"white"} variant="h6">Unavailable</Typography>
+            <Table
+                columns={ucolumns}
+                dataSource={Favourite ? Allproducts.ufavourites : Allproducts.unavailable}
                 pagination={{ position: ["none", "none"] }}
                 onChange={handleChange}>
 
@@ -200,6 +291,7 @@ const BuyerDashboard = () => {
                         .then((values) => {
                             form.resetFields();
                             handleSubmit(values);
+                            SetVisible(false);
                         })
                         .catch((info) => {
                             console.log('Validate Failed:', info);
@@ -227,7 +319,7 @@ const BuyerDashboard = () => {
                             placeholder="Addons"
                         >
                             {BuyProduct.name &&
-                                BuyProduct.addons.map((a, i) =>  <Select.Option value={a._id} label={a.name}>{a.name} {a.price}rs</Select.Option> )
+                                BuyProduct.addons.map((a, i) => <Select.Option value={a._id} label={a.name}>{a.name} {a.price}rs</Select.Option>)
                             }
 
                         </Select>

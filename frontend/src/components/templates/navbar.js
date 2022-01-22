@@ -27,13 +27,14 @@ const Navbar = () => {
   useEffect(async () => {
     var u = await getUser();
     setUser(u);
+  }, [navigate])
 
-    if (u.type === 'buyer') {
+  useEffect(async () => {
+    if (user.type === 'buyer') {
       var wallet = await GetWallet()
-      console.log(wallet)
       setWallet(wallet.message)
     }
-  }, [navigate])
+  })
 
   const Logout = () => {
     removeToken()
@@ -46,7 +47,6 @@ const Navbar = () => {
       message.error(res.error)
     else {
       message.success(res.message)
-      setWallet(wallet + parseInt(d.amount))
     }
   }
 
@@ -86,6 +86,7 @@ const Navbar = () => {
                           .then((values) => {
                             form.resetFields();
                             handleSubmit(values);
+                            setVisible(false);
                           })
                           .catch((info) => {
                             console.log('Validate Failed:', info);

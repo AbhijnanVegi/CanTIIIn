@@ -35,7 +35,8 @@ const ProductSchema = new Schema({
         }
     }],
     tags: {
-        type: [String]
+        type: [String],
+        uppercase: true
     }
 })
 
