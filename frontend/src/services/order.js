@@ -37,4 +37,10 @@ const pickupOrder = async (d) => {
     return res.data
 }
 
-export { getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder,pickupOrder }
+const rateOrder = async (d) => {
+    setToken()
+    const res = await axios.post('/orders/rate', d)
+    return res.data
+}
+
+export { getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder,pickupOrder, rateOrder }

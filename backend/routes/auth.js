@@ -41,7 +41,6 @@ router.post("/login", async(req, res) => {
 
 router.post("/register", async (req, res) => {
     const body = req.body
-    console.log(body)
 
     const saltRounds = 10
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;

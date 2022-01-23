@@ -12,7 +12,6 @@ const Title = () => {
 
     useEffect(async () => { 
         var user = await getUser()
-        console.log(user)
         if (user) {
             navigate('/dashboard')
         }

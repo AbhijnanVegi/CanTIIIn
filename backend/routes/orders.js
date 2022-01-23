@@ -11,7 +11,6 @@ router.post('/new', async (req, res) => {
     if (req.user.type !== "buyer") {
         return res.status(201).json({ status: 1, error: "Unauthorised" })
     }
-    // console.log(req.body)
 
     const product = await Product.findById(req.body.productId)
 
@@ -29,8 +28,6 @@ router.post('/new', async (req, res) => {
                 addons.push(addon)
                 total += addon.price
             }
-            else
-                console.log("Addon not added")
         })
     }
     total = total * req.body.quantity
@@ -49,9 +46,6 @@ router.post('/new', async (req, res) => {
     const vendor = await Vendor.findOne({ name: product.vendor })
     const opening = DateTime.fromISO(vendor.opening)
     const closing = DateTime.fromISO(vendor.closing)
-    console.log("now", now)
-    console.log("opening", opening)
-    console.log("closing", closing)
     if (
         (opening < closing && (now < opening || now > closing)) ||
         (opening > closing && (now < opening && now > closing))
@@ -109,8 +103,6 @@ router.post('/accept', async (req, res) => {
 
     const pending = await Order.find({ vendor: vendor.name, status: { $in: ['accepted', 'cooking'] } })
 
-    console.log(pending)
-
     if (pending >= 10)
         return res.json({ status: 1, error: "You can have at max 10 pending orders" })
 
@@ -155,14 +147,39 @@ router.post('/pickup', async (req, res) => {
         return res.json({ status: 1, error: "Unauthorised" })
 
     var order = await Order.findOne({ _id: req.body.id })
-    
+
     if (order.status !== 'pickup')
         return res.json({ status: 1, error: "Invalid operation" })
-    
+
     order.status = 'completed'
     order.save()
-    .then(() => { return res.json({ status: 0, message: "Order completed" }) })
-    .catch((err) => { return res.json({ status: 1, message: err }) }) 
+        .then(() => { return res.json({ status: 0, message: "Order completed" }) })
+        .catch((err) => { return res.json({ status: 1, message: err }) })
+})
+
+router.post('/rate', async (req, res) => {
+    if (req.user.type !== 'buyer')
+        return res.json({ status: 1, error: "Unauthorised" })
+
+    var order = await Order.findOne({ _id: req.body.id })
+    var product = await Product.findOne({ name: order.item.name })
+
+    
+    if (!(order.rating)) {
+        product.rating.count++
+        product.rating.total += parseInt(req.body.rating)
+    }
+    else {
+        product.rating.total += parseInt(req.body.rating) - order.rating
+    }
+    product.save()
+    order.rating = req.body.rating
+    order.save((err) => {
+        if (err)
+            return res.json({ status: 1, error: err })
+        return res.json({ status: 0, message: "Review added successfully" })
+    })
+
 })
 
 module.exports = router

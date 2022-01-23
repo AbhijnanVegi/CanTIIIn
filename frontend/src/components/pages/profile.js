@@ -43,7 +43,6 @@ const Profile = () => {
         if (Edit) return
 
         const res = await UpdateUserProfile(e)
-        console.log(res)
         if (res.status === 1) {
             message.error(res.error)
         }

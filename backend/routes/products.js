@@ -35,7 +35,6 @@ router.get('/', async (req, res) => {
         available: [],
         unavailable: [],
     }
-    console.log(buyer)
     products.forEach((p) => {
         if (open[p.vendor]) {
             resJson.available.push(p)
@@ -140,35 +139,35 @@ router.post('/favourite', async (req, res) => {
 
 })
 
-router.post('/rate', async (req, res) => {
-    if (req.user.type !== "buyer") {
-        return res.status(400).json({
-            message: "Unauthorised"
-        })
-    }
+// router.post('/rate', async (req, res) => {
+//     if (req.user.type !== "buyer") {
+//         return res.status(400).json({
+//             message: "Unauthorised"
+//         })
+//     }
 
-    var product = await Product.findById(req.body.productId)
-    if (!product) {
-        return res.status(404).json({
-            message: "Product not found"
-        })
-    }
+//     var product = await Product.findById(req.body.productId)
+//     if (!product) {
+//         return res.status(404).json({
+//             message: "Product not found"
+//         })
+//     }
 
-    if (!req.body.rating || req.body.rating < 1 || req.body.rating > 5) {
-        return res.status(200).json({
-            message: "Bad rating"
-        })
-    }
+//     if (!req.body.rating || req.body.rating < 1 || req.body.rating > 5) {
+//         return res.status(200).json({
+//             message: "Bad rating"
+//         })
+//     }
 
-    product.rating.count++
-    product.rating.total += parseInt(req.body.rating)
+//     product.rating.count++
+//     product.rating.total += parseInt(req.body.rating)
 
-    product.save((err) => {
-        if (err) {
-            return res.status(200).json({status:1, error:err})
-        }
-        return res.status(201).json({ status:0, message: "Review added successfully" })
-    })
-})
+//     product.save((err) => {
+//         if (err) {
+//             return res.status(200).json({status:1, error:err})
+//         }
+//         return res.status(201).json({ status:0, message: "Review added successfully" })
+//     })
+// })
 
 module.exports = router

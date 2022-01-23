@@ -72,7 +72,6 @@ const BuyerDashboard = () => {
         const data = { productId: id }
         const res = await toggleFav(data)
         const det = findProduct(id)
-        console.log(det)
         if (res.status === 1)
             message.error(res.error)
         else {
@@ -90,7 +89,6 @@ const BuyerDashboard = () => {
                     Allproducts.ufavourites.push(Allproducts.unavailable[det.index])
             }
         }
-        console.log(Allproducts.afavourites)
     }
 
     const handleChange = (pagination, filters, sorter) => {

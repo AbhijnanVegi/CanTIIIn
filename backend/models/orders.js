@@ -41,6 +41,7 @@ const OrderSchema = new Schema({
         min: 1,
         max: 5
     }
+
 })
 
 module.exports = Order = mongoose.model("Orders", OrderSchema)

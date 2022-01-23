@@ -1,9 +1,9 @@
-import { Button, Table, Tag, Row, Col, message, Space } from 'antd'
+import { Button, Table, Rate, message, Space } from 'antd'
 import { Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { getBuyerOrders, pickupOrder } from '../../services/order'
+import { getBuyerOrders, pickupOrder, rateOrder } from '../../services/order'
 
 const BuyerOrders = () => {
 
@@ -23,6 +23,17 @@ const BuyerOrders = () => {
             message.success(res.message)
             updateOrders()
         }
+    }
+
+    const handleRate = async (id, rating) => {
+        var data = { id: id, rating: rating }
+        const res = await rateOrder(data)
+        if (res.status === 1)
+            message.error(res.error)
+        else {
+            message.success(res.message)
+        }
+        
     }
 
     useEffect(() => {
@@ -81,6 +92,13 @@ const BuyerOrders = () => {
                     </Space>
                 </>
             )
+        },
+        {
+            title: 'Rating',
+            key: 'rating',
+            render: order => order.status === 'completed' ?(
+                <Rate defaultValue={order.rating || 0} onChange={(v) => {handleRate(order._id,v)}}/>
+            ) : <></>
         }
     ]
 
