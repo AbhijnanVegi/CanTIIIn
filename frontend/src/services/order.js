@@ -15,7 +15,7 @@ const getVendorOrders = async () => {
 
 const acceptOrder = async (d) => {
     setToken()
-    const res = await axios.post('/orders/accept',d)
+    const res = await axios.post('/orders/accept', d)
     return res.data
 }
 
@@ -43,4 +43,12 @@ const rateOrder = async (d) => {
     return res.data
 }
 
-export { getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder,pickupOrder, rateOrder }
+const getStats = async () => {
+    setToken()
+    const res = await axios.get('/orders/stats')
+    return res.data
+}
+
+export {
+    getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder, pickupOrder, rateOrder, getStats
+}

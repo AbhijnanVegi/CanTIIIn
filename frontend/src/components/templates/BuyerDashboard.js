@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { HeartOutlined, HeartFilled } from '@ant-design/icons'
 
 import { getProductList, placeOrder, toggleFav } from '../../services/product'
+import { useNavigate } from 'react-router-dom'
 
 const BuyerDashboard = () => {
 
@@ -12,6 +13,7 @@ const BuyerDashboard = () => {
     const [Favourite, setFavourite] = useState(false)
 
     const [form] = Form.useForm()
+    const navigate = useNavigate()
 
     const [VegFilter, setVegFilter] = useState(false)
     const [Search, setSearch] = useState('')
@@ -102,8 +104,10 @@ const BuyerDashboard = () => {
         const res = await placeOrder(data)
         if (res.status === 1)
             message.error(res.error)
-        else
+        else {
             message.success('Order placed successfully')
+            navigate('/orders')
+        }
     }
 
     useEffect(async () => {

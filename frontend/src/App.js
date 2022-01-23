@@ -15,6 +15,7 @@ import RegisterForm from "./components/pages/register"
 import Profile from "./components/pages/profile"
 import Dashboard from "./components/pages/dashboard"
 import Orders from "./components/pages/orders"
+import Stats from "./components/pages/stats"
 
 const Layout = () => {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/stats" element={ <Stats />} />
         </Route>
       </Routes>
     </BrowserRouter>

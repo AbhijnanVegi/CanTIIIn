@@ -164,7 +164,7 @@ router.post('/rate', async (req, res) => {
     var order = await Order.findOne({ _id: req.body.id })
     var product = await Product.findOne({ name: order.item.name })
 
-    
+
     if (!(order.rating)) {
         product.rating.count++
         product.rating.total += parseInt(req.body.rating)
@@ -180,6 +180,29 @@ router.post('/rate', async (req, res) => {
         return res.json({ status: 0, message: "Review added successfully" })
     })
 
+})
+
+router.get('/stats', async (req, res) => {
+    if (req.user.type !== 'vendor')
+        return res.json({ status: 1, error: "Unauthorised" })
+
+    const vendor = await Vendor.findOne({ email: req.user.email })
+    const products = await Product.find({ vendor: vendor.name })
+
+    
+    var productStats = []
+    for (const i in products) {
+        const product = products[i]
+        const orders = await Order.find({ 'item.name': product.name, vendor: vendor.name })
+        productStats.push({name:product.name, count: orders.length})
+    }
+    
+    const orders = await Order.find({vendor: vendor.name})
+    const completed = orders.filter((order) => order.status === 'completed')
+    const pending = orders.filter((order) => order.status === 'accepted' || order.status === 'cooking' || order.status === 'placed')
+    const topProducts = productStats.sort((a, b) => b.count - a.count).slice(0, 5)
+
+    return res.json({status:0, message: {top: topProducts, orders: orders.length, completed: completed.length, pending: pending.length}})
 })
 
 module.exports = router

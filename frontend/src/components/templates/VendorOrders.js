@@ -111,6 +111,10 @@ const VendorOrders = () => {
                         <>
                             REJECTED
                         </>
+                    ) : order.status === 'completed' ? (
+                        <>
+                            COMPLETED
+                        </>
                     ) : (
                         <>
                             {order.status.toUpperCase()}
