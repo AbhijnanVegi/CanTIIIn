@@ -19,4 +19,27 @@ const toggleFav = async (e) => {
     return res.data
 }
 
-export { getProductList, placeOrder, toggleFav }
+const getVendorProducts = async () => {
+    setToken()
+    const res = await axios.get('/products/vendor')
+    return res.data
+}
+
+const addProduct = async (d) => {
+    setToken()
+    const res = await axios.post('/products/new', d)
+    return res.data
+}
+
+const editProduct = async (d) => {
+    setToken()
+    const res = await axios.post('products/update', d)
+    return res.data
+}
+
+const deleteProduct = async (d) => {
+    const res = await axios.post('products/delete', d)
+    return res.data
+}
+
+export { getProductList, placeOrder, toggleFav, getVendorProducts, addProduct, editProduct, deleteProduct }

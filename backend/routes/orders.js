@@ -82,19 +82,23 @@ router.post('/new', async (req, res) => {
 
 })
 
-router.get('/my', async (req, res) => {
-    if (req.user.type === "buyer")
-        var user = await Buyer.find({email : req.user.email})
-    else
-        var user = await Vendor.find({ email: req.user.type })
+router.get('/buyer', async (req, res) => {
+    if (req.user.type !== 'buyer')
+        return res.json({ status: 1, error: "Unauthorised" })
     
-    var orders
+    const orders = await Order.find({ buyer: req.user.email })
+    return res.json({status: 0, message: orders})
+})
 
-    if (req.user.type === "buyer")
-        orders = await Order.find({ buyer: req.user.email })
-    else
-        orders = await Order.find({ vendor: user.name })
-    return res.status(200).json(orders)
+router.get('/vendor', async (req, res) => {
+    if (req.user.type !== 'vendor')
+            return res.json({status: 1, error : "Unauthorised"})
+
+    const vendor = await Vendor.findOne({ email: req.user.email })
+
+    const orders = await Order.find({vendor: vendor.name})
+
+    return res.json({status:0, message :orders})
 })
 
 module.exports = router

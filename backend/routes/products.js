@@ -9,6 +9,8 @@ router.get('/', async (req, res) => {
     const vendors = await Vendor.find({})
 
     const buyer = await Buyer.findOne({email : req.user.email})
+    if (!buyer)
+        return res.json({status:1, error: "Unauthorised"})
 
     const isOpen = (vendor) => {
         var now = new Date()
@@ -48,9 +50,19 @@ router.get('/', async (req, res) => {
     return res.json({status:0, message: resJson})
 })
 
+router.get('/vendor', async (req, res) => {
+    if (req.user.type !== 'vendor')
+        return res.json({status: 1, error: "Unauthorised"})
+
+    const vendor = await Vendor.findOne({ email: req.user.email })
+    const products = await Product.find({ vendor: vendor.name })
+
+    return res.json({status:0, message: products})
+})
+
 router.post('/new', async (req, res) => {
     if (req.user.type !== "vendor") {
-        return res.status(401).json({ message: "Unauthorized" })
+        return res.status(401).json({status:1, error: "Unauthorized" })
     }
 
     var vendor = await Vendor.findOne({ email: req.user.email })
@@ -60,16 +72,44 @@ router.post('/new', async (req, res) => {
         price: req.body.price,
         isnv: req.body.isnv,
         vendor: vendor.name,
-        addons: JSON.parse(req.body.addons),
-        tags: JSON.parse(req.body.tags),
+        addons:req.body.addons,
+        tags: req.body.tags,
     })
 
     product.save((err) => {
         if (err) {
-            return res.status(500).json(err)
+            console.log(err)
+            return res.status(200).json({status: 1, error: err})
         }
-        return res.status(201).json(product)
+        return res.status(200).json({ status :0, message: product })
     })
+})
+
+
+router.post("/update", async (req, res) => {
+    if (req.user.type !== "vendor") {
+        return res.status(401).json({status:1, error: "Unauthorized" })
+    } 
+
+    Product.updateOne({ _id: req.body.id }, req.body, (err, doc) => {
+        if (err)
+            return res.json({status:1, error: err})
+    })
+
+    return res.json({status:0, message: "Product updated successfully"})
+})
+
+router.post("/delete", async (req, res) => {
+    if (req.user.type !== "vendor") {
+        return res.status(401).json({status:1, error: "Unauthorized" })
+    }  
+
+    Product.deleteOne({ _id: req.body.id }, (err, doc) => {
+        if (err)
+                return res.json({status: 1, error: err})
+    })
+    
+    return res.json({status:0, message:"Product deleted successfully"})
 })
 
 router.post('/favourite', async (req, res) => {
@@ -93,7 +133,7 @@ router.post('/favourite', async (req, res) => {
 
     buyer.save((err) => {
         if (err) {
-            return res.status(500).json(err)
+            return res.status(200).json({status: 1, error: err})
         }
         return res.status(201).json({status:0, message: "Favourite updated" })
     })
@@ -125,9 +165,9 @@ router.post('/rate', async (req, res) => {
 
     product.save((err) => {
         if (err) {
-            return res.status(500).json(err)
+            return res.status(200).json({status:1, error:err})
         }
-        return res.status(201).json({ message: "Review added successfully" })
+        return res.status(201).json({ status:0, message: "Review added successfully" })
     })
 })
 

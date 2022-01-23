@@ -10,6 +10,8 @@ import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { Modal, Form, Input, message } from 'antd'
 
 import { getUser, removeToken } from "../../services/auth";
@@ -103,8 +105,13 @@ const Navbar = () => {
 
                     </Modal>
                   </>
-                ) : <></>
+                ) : <Button sx={{ marginX: "5px" }} color="inherit" variant="outlined" onClick={() => navigate("/stats")}>
+                <AssessmentIcon />
+              </Button>
               }
+              <Button sx={{ marginX: "5px" }} color="inherit" variant="outlined" onClick={() => navigate("/orders")}>
+                <ListAltIcon />
+              </Button>
               <Button sx={{ marginX: "5px" }} color="inherit" variant="outlined" onClick={() => navigate("/profile")}>
                 <AccountCircleOutlinedIcon />
               </Button>

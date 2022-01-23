@@ -4,20 +4,24 @@ import { useNavigate } from "react-router-dom"
 
 
 import BuyerDashboard from "../templates/BuyerDashboard"
+import VendorDashboard from "../templates/VendorDashboard"
 
 import { getUser } from '../../services/auth'
 
 const Dashboard = () => {
 
-    const [IsBuyer, setIsBuyer] = useState(true);
+    const [UserType, setUserType] = useState('');
     const navigate = useNavigate()
     
     useEffect(async () => {
         const u = await getUser()
         if (!u) navigate('/login')
         if (u.type === 'vendor') {
-            setIsBuyer(false)
-        }
+            setUserType('vendor')
+        } else 
+        {
+            setUserType('buyer')
+            }
     }, [])
 
     return (
@@ -30,7 +34,7 @@ const Dashboard = () => {
                 paddingX:"1rem"
             }}>
             <Typography variant="h4" align="center" sx={{ paddingBottom: "1rem", color: "white" }}>Dashboard</Typography>
-            {IsBuyer ? <BuyerDashboard /> : <></>}
+            {UserType === 'buyer' ? <BuyerDashboard /> : <VendorDashboard />}
             </Paper>
         </Container>
     )
