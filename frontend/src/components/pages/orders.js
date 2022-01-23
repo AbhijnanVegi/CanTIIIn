@@ -2,8 +2,8 @@ import { Container, Paper, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// import BuyerOrders from "../templates/BuyerOrders"
-// import VendorOrders from "../templates/VendorOrders"
+import BuyerOrders from "../templates/BuyerOrders"
+import VendorOrders from "../templates/VendorOrders"
 
 import { getUser } from "../../services/auth"
 
@@ -32,7 +32,8 @@ const Orders = () => {
             paddingX:"1rem"
         }}>
         <Typography variant="h4" align="center" sx={{ paddingBottom: "1rem", color: "white" }}>Orders</Typography>
-        {/* {UserType === 'buyer' ? <BuyerOrders /> : <VendorOrders />} */}
+        {/* <BuyerOrders /> */}
+        {UserType === 'buyer' ? <BuyerOrders /> : <VendorOrders />}
         </Paper>
     </Container>
     )
