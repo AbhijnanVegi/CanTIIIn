@@ -12,6 +12,11 @@ const LoginUser = async (user) => {
     return res.data
 }
 
+const LoginGoogleUser = async (data) => {
+  const res = await axios.post("/auth/google", data)
+  return res.data
+}
+
 const RegisterUser = async (user) => {
     const res = await axios.post("/auth/register", user)
 
@@ -52,4 +57,4 @@ const getUser = async () => {
     return res.data
 }
 
-export { LoginUser, RegisterUser, getUser, setToken, removeToken }
+export { LoginUser, RegisterUser, LoginGoogleUser, getUser, setToken, removeToken }

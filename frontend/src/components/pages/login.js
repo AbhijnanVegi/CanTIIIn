@@ -1,9 +1,11 @@
 import { Grid, Container, Paper, Typography, TextField, Alert } from "@mui/material"
-import { Form, Input, Button, message } from "antd"
+import { Form, Input, Button, message, Divider, Row, Col } from "antd"
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { LoginUser, getUser } from "../../services/auth"
+import { LoginUser,LoginGoogleUser, getUser } from "../../services/auth"
+import { GoogleLogin } from "react-google-login"
+import axios from 'axios'
 
 const LoginForm = () => {
 
@@ -12,6 +14,24 @@ const LoginForm = () => {
 
     const handleSubmit = async (e) => {
         const res = await LoginUser(e)
+        if (res.status === 1) {
+            message.error(res.error)
+            form.setFieldsValue({
+                email: "",
+                password: ""
+            })
+        }
+        else {
+            window.localStorage.setItem('Authorization', 'Bearer ' + res.token);
+            navigate("/dashboard")
+        }
+    }
+
+    const handleLogin = async (t) => {
+        console.log(t)
+
+        const res = await LoginGoogleUser({token : t.tokenId})
+
         if (res.status === 1) {
             message.error(res.error)
             form.setFieldsValue({
@@ -76,6 +96,18 @@ const LoginForm = () => {
                         </Button>
                     </Form.Item>
                 </Form>
+                <Divider />
+                <Row>
+                    <Col span={12} offset={7}>
+                        <GoogleLogin
+                            clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+                            buttonText="Log in with Google"
+                            onSuccess={handleLogin}
+                            onFailure={handleLogin}
+                            cookiePolicy={'single_host_origin'}
+                        />
+                    </Col>
+                </Row>
             </Paper>
         </Container >
     )

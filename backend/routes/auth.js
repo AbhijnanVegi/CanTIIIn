@@ -8,6 +8,9 @@ const User = require("../models/users")
 const { Buyer, Vendor} = require("../models/types")
 const AUTH_SECRET = require("../utils/config")
 
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+
 router.post("/login", async(req, res) => {
     var body = req.body
 
@@ -36,6 +39,37 @@ router.post("/login", async(req, res) => {
     res.status(200).json({
         status: 0,
         token: token
+    })
+})
+
+router.post("/google", async (req, res) => {
+    const token = req.body.token
+    
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+    })
+
+    const { email } = ticket.getPayload()
+
+    const user = await User.findOne({ email: email })
+    if (!user) {
+        return res.status(200).json({
+            status: 1,
+            error : "Email not registered"
+        })
+    } 
+
+    const tokenMap = {
+        email: user.email,
+        type: user.type
+    }
+
+    const authToken = jwt.sign(tokenMap, AUTH_SECRET)
+
+    res.status(200).json({
+        status: 0,
+        token: authToken
     })
 })
 
