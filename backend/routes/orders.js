@@ -6,6 +6,24 @@ const { DateTime } = require("luxon")
 const Order = require("../models/orders")
 const Product = require("../models/products")
 const { Buyer, Vendor } = require("../models/types")
+const { EMAIL_USER, EMAIL_PASS } = require("../utils/config")
+
+var nodemailer = require("nodemailer")
+
+let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  }); 
+
+
 
 router.post('/new', async (req, res) => {
     if (req.user.type !== "buyer") {
@@ -106,6 +124,18 @@ router.post('/accept', async (req, res) => {
     if (pending >= 10)
         return res.json({ status: 1, error: "You can have at max 10 pending orders" })
 
+    var mailOptions = {
+        from: EMAIL_USER,
+        to: order.buyer,
+        subject: "Order Accepted",
+        text: "Your order has been accepted by " + vendor.name
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) console.log(error)
+        else console.log(info)
+    })
+
     order.status = 'accepted'
     order.save()
         .then(() => { return res.json({ status: 0, message: "Order accepted" }) })
@@ -118,9 +148,21 @@ router.post('/reject', async (req, res) => {
 
     var order = await Order.findOne({ _id: req.body.id })
     var buyer = await Buyer.findOne({ email: order.buyer })
+    var vendor =  await Vendor.findOne({ name: order.vendor })
 
     buyer.wallet += order.total
     buyer.save()
+
+    var mailOptions = {
+        from: EMAIL_USER,
+        to: order.buyer,
+        subject: "Order Rejected",
+        text: "Your order has been rejected by " + vendor.name
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) console.log(error)
+    })
 
     order.status = 'rejected'
     order.save()
@@ -193,20 +235,20 @@ router.get('/stats', async (req, res) => {
     const vendor = await Vendor.findOne({ email: req.user.email })
     const products = await Product.find({ vendor: vendor.name })
 
-    
+
     var productStats = []
     for (const i in products) {
         const product = products[i]
         const orders = await Order.find({ 'item.name': product.name, vendor: vendor.name })
-        productStats.push({name:product.name, count: orders.length})
+        productStats.push({ name: product.name, count: orders.length })
     }
-    
-    const orders = await Order.find({vendor: vendor.name})
+
+    const orders = await Order.find({ vendor: vendor.name })
     const completed = orders.filter((order) => order.status === 'completed')
     const pending = orders.filter((order) => order.status === 'accepted' || order.status === 'cooking' || order.status === 'placed')
     const topProducts = productStats.sort((a, b) => b.count - a.count).slice(0, 5)
 
-    return res.json({status:0, message: {top: topProducts, orders: orders.length, completed: completed.length, pending: pending.length}})
+    return res.json({ status: 0, message: { top: topProducts, orders: orders.length, completed: completed.length, pending: pending.length } })
 })
 
 module.exports = router

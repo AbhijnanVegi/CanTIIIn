@@ -32,7 +32,7 @@ const Navbar = () => {
   }, [navigate])
 
   useEffect(async () => {
-    if (user.type === 'buyer') {
+    if (user && user.type === 'buyer') {
       const updateWallet = async () => {
         var wallet = await GetWallet()
         setWallet(wallet.message)

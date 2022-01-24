@@ -6,7 +6,7 @@ const { DateTime } = require("luxon")
 
 const User = require("../models/users")
 const { Buyer, Vendor} = require("../models/types")
-const AUTH_SECRET = require("../utils/config")
+const { AUTH_SECRET } = require("../utils/config")
 
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)

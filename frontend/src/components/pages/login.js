@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { LoginUser,LoginGoogleUser, getUser } from "../../services/auth"
 import { GoogleLogin } from "react-google-login"
-import axios from 'axios'
 
 const LoginForm = () => {
 
@@ -22,14 +21,13 @@ const LoginForm = () => {
             })
         }
         else {
+            console.log(res.token)
             window.localStorage.setItem('Authorization', 'Bearer ' + res.token);
             navigate("/dashboard")
         }
     }
 
     const handleLogin = async (t) => {
-        console.log(t)
-
         const res = await LoginGoogleUser({token : t.tokenId})
 
         if (res.status === 1) {

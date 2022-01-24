@@ -18,7 +18,7 @@ const Dashboard = () => {
         if (!u) navigate('/login')
         if (u.type === 'vendor') {
             setUserType('vendor')
-        } else 
+        } else
         {
             setUserType('buyer')
             }
