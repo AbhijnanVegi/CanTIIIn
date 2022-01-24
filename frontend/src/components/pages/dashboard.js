@@ -34,7 +34,7 @@ const Dashboard = () => {
                 paddingX:"1rem"
             }}>
             <Typography variant="h4" align="center" sx={{ paddingBottom: "1rem", color: "white" }}>Dashboard</Typography>
-            {UserType === 'buyer' ? <BuyerDashboard /> : <VendorDashboard />}
+            {UserType === 'buyer' ? <BuyerDashboard /> : UserType === 'vendor' ? <VendorDashboard /> : <></>}
             </Paper>
         </Container>
     )
