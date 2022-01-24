@@ -1,6 +1,8 @@
 import { Container, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import { Row, Col, Statistic, List }from 'antd'
+import {
+    Row, Col, Statistic, List, Divider
+} from 'antd'
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -10,9 +12,9 @@ import {
     Title,
     Tooltip,
     Legend,
-  } from 'chart.js';
+} from 'chart.js';
 
-import { getStats, getBatchStats } from "../../services/order"
+import { getStats, getBatchStats, getAgeStats } from "../../services/order"
 
 const Stats = () => {
 
@@ -20,8 +22,13 @@ const Stats = () => {
 
     const [BatchOrders, setBatchOrders] = useState([])
 
-    const data = {
-        labels: ['UG1','UG2','UG3','UG4', 'UG5'],
+    const [AgeOrders, setAgeOrders] = useState({
+        labels: [],
+        data: []
+    })
+
+    const BatchData = {
+        labels: ['UG1', 'UG2', 'UG3', 'UG4', 'UG5'],
         datasets: [{
             label: 'Orders',
             data: BatchOrders,
@@ -29,6 +36,17 @@ const Stats = () => {
             borderColor: 'rgb(255, 99, 132)',
         }]
     }
+
+    const AgeData = {
+        labels: AgeOrders.labels,
+        datasets: [{
+            label: 'Orders',
+            data: AgeOrders.data,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+        }]
+    }
+
 
     ChartJS.register(
         CategoryScale,
@@ -45,6 +63,8 @@ const Stats = () => {
             setStats(res.message)
             res = await getBatchStats()
             setBatchOrders(res.message)
+            res = await getAgeStats()
+            setAgeOrders(res.message)
         }
         updateStats()
     }, [])
@@ -62,13 +82,13 @@ const Stats = () => {
                     <Typography variant="h4" align="center" sx={{ paddingBottom: "1rem", color: "white" }}>Statistics</Typography>
                     <Row>
                         <Col span={6} offset={2}>
-                            <Statistic title="Total orders" value={ Stats.orders }/>
+                            <Statistic title="Total orders" value={Stats.orders} />
                         </Col>
                         <Col span={6} offset={2}>
-                            <Statistic title="Completed orders" value={ Stats.completed }/>
+                            <Statistic title="Completed orders" value={Stats.completed} />
                         </Col>
                         <Col span={6} offset={2}>
-                            <Statistic title="Pending orders" value={ Stats.pending }/>
+                            <Statistic title="Pending orders" value={Stats.pending} />
                         </Col>
                     </Row>
                     <Typography variant="h6" sx={{ paddingY: "1rem", color: "white" }} >Top sales</Typography>
@@ -81,7 +101,9 @@ const Stats = () => {
                             </List.Item>
                         )}
                     />
-                    <Bar data={data}/>
+                    <Bar data={BatchData} />
+                    <Divider />
+                    <Bar data={AgeData} />
                 </Paper>
             </Container>
         </>

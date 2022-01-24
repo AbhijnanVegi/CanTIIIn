@@ -15,13 +15,13 @@ let transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS,
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
     },
     tls: {
-      rejectUnauthorized: false
+        rejectUnauthorized: false
     }
-  }); 
+});
 
 
 
@@ -148,7 +148,7 @@ router.post('/reject', async (req, res) => {
 
     var order = await Order.findOne({ _id: req.body.id })
     var buyer = await Buyer.findOne({ email: order.buyer })
-    var vendor =  await Vendor.findOne({ name: order.vendor })
+    var vendor = await Vendor.findOne({ name: order.vendor })
 
     buyer.wallet += order.total
     buyer.save()
@@ -272,6 +272,36 @@ router.get('/batchstats', async (req, res) => {
     }
 
     return res.json({ status: 0, message: batchOrders })
+})
+
+router.get('/agestats', async (req, res) => {
+    if (req.user.type !== 'vendor')
+        return res.json({ status: 1, error: "Unauthorised" })
+
+    const vendor = await Vendor.findOne({ email: req.user.email })
+
+    var ageOrders = {}
+    const users = await Buyer.find({})
+    for (const i in users) {
+        const user = users[i]
+        const orders = await Order.find({ buyer: user.email, vendor: vendor.name })
+        if (!ageOrders[user.age])
+            ageOrders[user.age] = 0
+        ageOrders[user.age] += orders.length
+    }
+
+    var labels = []
+    var data = []
+
+    for (var i = 0; i < 100; i++) {
+        if (ageOrders[i])
+        {
+            labels.push(i)
+            data.push(ageOrders[i])
+            }
+    }
+
+    return res.json({ status: 0, message: { labels: labels, data: data } })
 })
 
 module.exports = router

@@ -55,6 +55,12 @@ const getBatchStats = async () => {
     return res.data
 }
 
+const getAgeStats = async () => {
+    setToken()
+    const res = await axios.get('/orders/agestats')
+    return res.data
+}
+
 export {
-    getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder, pickupOrder, rateOrder, getStats, getBatchStats
+    getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder, pickupOrder, rateOrder, getStats, getBatchStats, getAgeStats
 }
