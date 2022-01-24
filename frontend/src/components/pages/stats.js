@@ -1,16 +1,52 @@
 import { Container, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Row, Col, Statistic, List }from 'antd'
-import { getStats } from "../../services/order"
+import { Bar } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+  } from 'chart.js';
+
+import { getStats, getBatchStats } from "../../services/order"
 
 const Stats = () => {
 
     const [Stats, setStats] = useState({})
 
-    useEffect(async () => {
-        const res = await getStats()
-        setStats(res.message)
-        console.log(res.message)
+    const [BatchOrders, setBatchOrders] = useState([])
+
+    const data = {
+        labels: ['UG1','UG2','UG3','UG4', 'UG5'],
+        datasets: [{
+            label: 'Orders',
+            data: BatchOrders,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+        }]
+    }
+
+    ChartJS.register(
+        CategoryScale,
+        LinearScale,
+        BarElement,
+        Title,
+        Tooltip,
+        Legend
+    );
+
+    useEffect(() => {
+        const updateStats = async () => {
+            var res = await getStats()
+            setStats(res.message)
+            res = await getBatchStats()
+            setBatchOrders(res.message)
+        }
+        updateStats()
     }, [])
 
     return (
@@ -45,6 +81,7 @@ const Stats = () => {
                             </List.Item>
                         )}
                     />
+                    <Bar data={data}/>
                 </Paper>
             </Container>
         </>

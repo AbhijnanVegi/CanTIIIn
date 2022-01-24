@@ -49,6 +49,12 @@ const getStats = async () => {
     return res.data
 }
 
+const getBatchStats = async () => {
+    setToken()
+    const res = await axios.get('/orders/batchstats')
+    return res.data
+}
+
 export {
-    getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder, pickupOrder, rateOrder, getStats
+    getBuyerOrders, getVendorOrders, acceptOrder, rejectOrder, moveOrder, pickupOrder, rateOrder, getStats, getBatchStats
 }

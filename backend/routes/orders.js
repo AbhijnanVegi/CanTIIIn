@@ -251,4 +251,27 @@ router.get('/stats', async (req, res) => {
     return res.json({ status: 0, message: { top: topProducts, orders: orders.length, completed: completed.length, pending: pending.length } })
 })
 
+router.get('/batchstats', async (req, res) => {
+    if (req.user.type !== 'vendor')
+        return res.json({ status: 1, error: "Unauthorised" })
+
+    const vendor = await Vendor.findOne({ email: req.user.email })
+
+    const batches = ['UG1', 'UG2', 'UG3', 'UG4', 'UG5']
+    const batchOrders = []
+    for (const i in batches) {
+        const batch = batches[i]
+        const users = await Buyer.find({ batch: batch })
+        var total = 0;
+        for (const j in users) {
+            const user = users[j]
+            const orders = await Order.find({ buyer: user.email, vendor: vendor.name })
+            total += orders.length
+        }
+        batchOrders.push(total)
+    }
+
+    return res.json({ status: 0, message: batchOrders })
+})
+
 module.exports = router
