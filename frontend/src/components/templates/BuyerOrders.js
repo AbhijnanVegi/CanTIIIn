@@ -38,6 +38,7 @@ const BuyerOrders = () => {
 
     useEffect(() => {
         updateOrders()
+        setInterval(updateOrders, 5000)
     }, [])
 
     const columns = [

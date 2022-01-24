@@ -117,6 +117,10 @@ router.post('/reject', async (req, res) => {
         return res.json({ status: 1, error: "Unauthorised" })
 
     var order = await Order.findOne({ _id: req.body.id })
+    var buyer = await Buyer.findOne({ email: order.buyer })
+
+    buyer.wallet += order.total
+    buyer.save()
 
     order.status = 'rejected'
     order.save()

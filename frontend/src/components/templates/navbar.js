@@ -33,8 +33,12 @@ const Navbar = () => {
 
   useEffect(async () => {
     if (user.type === 'buyer') {
-      var wallet = await GetWallet()
-      setWallet(wallet.message)
+      const updateWallet = async () => {
+        var wallet = await GetWallet()
+        setWallet(wallet.message)
+      }
+      updateWallet()
+      setInterval(updateWallet, 5000)
     }
   }, [user, navigate])
 
@@ -106,8 +110,8 @@ const Navbar = () => {
                     </Modal>
                   </>
                 ) : <Button sx={{ marginX: "5px" }} color="inherit" variant="outlined" onClick={() => navigate("/stats")}>
-                <AssessmentIcon />
-              </Button>
+                  <AssessmentIcon />
+                </Button>
               }
               <Button sx={{ marginX: "5px" }} color="inherit" variant="outlined" onClick={() => navigate("/orders")}>
                 <ListAltIcon />
