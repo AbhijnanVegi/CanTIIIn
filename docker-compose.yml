@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+    backend:
+      build: ./backend
+      restart: unless-stopped
+      ports: 
+        - "4000:4000"
+        - "27017:27017"
+    frontend:
+      depends_on:
+        - backend
+      build:
+        context: ./frontend
+        # args:
+          # - REACT_APP_API_BASE_URL=
+      ports:
+        - "8080:80"
+
