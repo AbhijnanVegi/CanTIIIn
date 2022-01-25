@@ -26,10 +26,11 @@ const Profile = () => {
             setIsBuyer(false)
 
         const user = await GetUserProfile()
-        const { opening, closing, ...rest } = user
+        const { opening, closing, age,...rest } = user
         form.setFieldsValue({
             opening: moment(opening, "HH:mm"),
             closing: moment(closing, "HH:mm"),
+            age: age.toString()
         })
         form.setFieldsValue(rest)
 
