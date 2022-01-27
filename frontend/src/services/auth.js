@@ -51,7 +51,6 @@ const getUser = async () => {
     const res = await axios.post("/user/token")
     if (res.data.status === 1)
     {
-      console.log(res.data.error)
         removeToken()
         return null
     }

@@ -75,6 +75,7 @@ router.post('/new', async (req, res) => {
         buyer: buyer.email,
         vendor: product.vendor,
         item: {
+            id: product._id,
             name: product.name,
             price: product.price,
             addon: addons
@@ -208,17 +209,18 @@ router.post('/rate', async (req, res) => {
         return res.json({ status: 1, error: "Unauthorised" })
 
     var order = await Order.findOne({ _id: req.body.id })
-    var product = await Product.findOne({ name: order.item.name })
+    var product = await Product.findOne({ _id: order.item.id })
 
-
-    if (!(order.rating)) {
-        product.rating.count++
-        product.rating.total += parseInt(req.body.rating)
+    if (product) {
+        if (!(order.rating)) {
+            product.rating.count++
+            product.rating.total += parseInt(req.body.rating)
+        }
+        else {
+            product.rating.total += parseInt(req.body.rating) - order.rating
+        }
+        product.save()
     }
-    else {
-        product.rating.total += parseInt(req.body.rating) - order.rating
-    }
-    product.save()
     order.rating = req.body.rating
     order.save((err) => {
         if (err)
@@ -294,11 +296,10 @@ router.get('/agestats', async (req, res) => {
     var data = []
 
     for (var i = 0; i < 100; i++) {
-        if (ageOrders[i])
-        {
+        if (ageOrders[i]) {
             labels.push(i)
             data.push(ageOrders[i])
-            }
+        }
     }
 
     return res.json({ status: 0, message: { labels: labels, data: data } })

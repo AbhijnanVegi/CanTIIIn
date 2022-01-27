@@ -11,6 +11,7 @@ const OrderSchema = new Schema({
         required: true
     },
     item: {
+        id : {type: mongoose.Types.ObjectId, ref: "Product", required: true},
         name: { type: String, required: true },
         price: { type: Number, required: true },
         addon: [{
