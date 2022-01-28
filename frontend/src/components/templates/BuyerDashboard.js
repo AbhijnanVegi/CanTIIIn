@@ -2,6 +2,7 @@ import { Button, Table, Tag, Input, Switch, Row, Col, message, Modal, Form, Sele
 import { Typography } from "@mui/material"
 import { useState, useEffect } from "react"
 import { HeartOutlined, HeartFilled } from '@ant-design/icons'
+import fuzzy from 'fuzzy'
 
 import { getProductList, placeOrder, toggleFav } from '../../services/product'
 import { useNavigate } from 'react-router-dom'
@@ -139,7 +140,12 @@ const BuyerDashboard = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            onFilter: (value, record) => value ? record.name.toLowerCase().includes(value.toLowerCase()) : true,
+            onFilter: (value, record) => {
+                var t = [record.name.toLowerCase()]
+                let r = fuzzy.filter(value.toLowerCase(), t)
+                let m = r.map((x) => x.string)
+                return m.length === 1
+            },
             filteredValue: [Search]
         },
         {
@@ -221,7 +227,12 @@ const BuyerDashboard = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            onFilter: (value, record) => value ? record.name.toLowerCase().includes(value.toLowerCase()) : true,
+            onFilter: (value, record) => {
+                var t = [record.name.toLowerCase()]
+                let r = fuzzy.filter(value.toLowerCase(), t)
+                let m = r.map((x) => x.string)
+                return m.length === 1
+            },
             filteredValue: [Search]
         },
         {
