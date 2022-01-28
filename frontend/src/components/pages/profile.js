@@ -30,7 +30,7 @@ const Profile = () => {
         form.setFieldsValue({
             opening: moment(opening, "HH:mm"),
             closing: moment(closing, "HH:mm"),
-            age: age.toString()
+            age: age? age.toString() : "",
         })
         form.setFieldsValue(rest)
 
